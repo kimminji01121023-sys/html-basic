@@ -111,53 +111,10 @@
             <input type="number" id="num2" placeholder="숫자를 입력하세요">
         </div>
         
-        <button class="calculate-btn" onclick="calculate()">계산하기</button>
+        <button class="calculate-btn">계산하기</button>
         
         <div class="result" id="result">결과가 여기에 표시됩니다</div>
     </div>
 
-    <script>
-        function calculate() {
-            const num1 = parseFloat(document.getElementById('num1').value);
-            const num2 = parseFloat(document.getElementById('num2').value);
-            const operator = document.getElementById('operator').value;
-            const resultDiv = document.getElementById('result');
-            
-            // 입력값 검증
-            if (isNaN(num1) || isNaN(num2)) {
-                resultDiv.textContent = '숫자를 입력해주세요!';
-                resultDiv.style.color = '#ff4444';
-                return;
-            }
-            
-            // Java 서버로 계산 요청
-            const expression = num1 + operator + num2;
-            
-            fetch('http://localhost:8080/api/calculate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    expression: expression
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    resultDiv.textContent = `결과: ${data.result}`;
-                    resultDiv.style.color = '#333';
-                } else {
-                    resultDiv.textContent = '계산 오류: ' + data.error;
-                    resultDiv.style.color = '#ff4444';
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultDiv.textContent = '서버 연결 오류';
-                resultDiv.style.color = '#ff4444';
-            });
-        }
-    </script>
 </body>
 </html>
