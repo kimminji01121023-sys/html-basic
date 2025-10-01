@@ -5,24 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello World</title>
     <style>
-        .highlight {
-            color: red;
-            font-size: 30pt;
-        }
-        p {
-            font-size: 20pt;
-            text-align: center;
-        }
         body {
+            font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-color: #f0f0f0;
+        }
+        .calculator {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+        .title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="number"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: white;
+            box-sizing: border-box;
+        }
+        select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin: 20px 0;
+        }
+        .calculate-btn:hover {
+            background-color: #45a049;
+        }
+        .result {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            border: 2px solid #ddd;
         }
     </style>
 </head>
 <body>
-     <p><span class="highlight">하이미디어</span> 소프트웨어 융합과 <span class="highlight">하이미디어</span> 인공지능 연계 창업</p>
+    <div class="calculator">
+        <h1 class="title">계산기</h1>
+        
+        <div class="input-group">
+            <label for="num1">첫 번째 숫자:</label>
+            <input type="number" id="num1" placeholder="숫자를 입력하세요">
+        </div>
+        
+        <div class="input-group">
+            <label for="operator">연산자:</label>
+            <select id="operator">
+                <option value="+">+ (덧셈)</option>
+                <option value="-">- (뺄셈)</option>
+                <option value="*">× (곱셈)</option>
+                <option value="/">÷ (나눗셈)</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="num2">두 번째 숫자:</label>
+            <input type="number" id="num2" placeholder="숫자를 입력하세요">
+        </div>
+        
+        <button class="calculate-btn" onclick="calculate()">계산하기</button>
+        
+        <div class="result" id="result">결과가 여기에 표시됩니다</div>
+    </div>
+
+    <script>
+        function calculate() {
+            const num1 = parseFloat(document.getElementById('num1').value);
+            const num2 = parseFloat(document.getElementById('num2').value);
+            const operator = document.getElementById('operator').value;
+            const resultDiv = document.getElementById('result');
+            
+            // 입력값 검증
+            if (isNaN(num1) || isNaN(num2)) {
+                resultDiv.textContent = '숫자를 입력해주세요!';
+                resultDiv.style.color = '#ff4444';
+                return;
+            }
+            
+            // Java 서버로 계산 요청
+            const expression = num1 + operator + num2;
+            
+            fetch('http://localhost:8080/api/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    expression: expression
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    resultDiv.textContent = `결과: ${data.result}`;
+                    resultDiv.style.color = '#333';
+                } else {
+                    resultDiv.textContent = '계산 오류: ' + data.error;
+                    resultDiv.style.color = '#ff4444';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.textContent = '서버 연결 오류';
+                resultDiv.style.color = '#ff4444';
+            });
+        }
+    </script>
 </body>
 </html>
